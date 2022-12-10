@@ -22,16 +22,17 @@ More specifically,
 
 To install verificatio, simply:
 
-```bash
-$ pip install verificatio
+```zsh
+pi@K47CH22 ~ % git clone https://github.com/vedilink/verificatio.git
+pi@K47CH22 ~ % python setup.py install
 ```
 
 
 #### Running tests
 
-```bash
-$ pip install tox 
-$ tox
+```zsh
+pi@K47CH22 ~ % pip install tox
+pi@K47CH22 ~ % tox
 ```
 
 
@@ -62,9 +63,9 @@ if verified:
 
 ### Configuration
 
-The library by deafault uses SQLite to store and match generated verification payloads, which can be easily swapped with any database backend by passing the database connection url to `DATABASE_URL` environment variable.
+The library by default uses [SQLite](https://www.sqlite.org/index.html) to store and match generated verification payloads, which can be easily swapped with any database backend by passing the database connection url to `DATABASE_URL` environment variable.
 
 
 ### Licenses
 
-All source code is licensed under the MIT License.
+All source code is licensed under the [MIT License](LICENSE).
