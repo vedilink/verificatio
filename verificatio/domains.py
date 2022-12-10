@@ -4,7 +4,7 @@ import requests
 import logging
 import dns.resolver
 from .database import setup_db, retrieve
-from .conf import CHECK_TYPES, SERVICE_PREFIX, CNAME_VALUE, FAKE_USER_AGENT
+from .conf import CHECK_TYPES, SERVICE_PREFIX, CNAME_PREFIX, CNAME_HOST, FAKE_USER_AGENT
 try:
     from HTMLParser import HTMLParser
 except ImportError:
@@ -23,16 +23,21 @@ class NoVerificationCodeExists(Exception):
     pass
 
 
-def _verify_cname(subdomain, value=CNAME_VALUE):
+def _verify_cname(domain, value, prefix=CNAME_PREFIX, host=CNAME_HOST):
+    """
+    Validates a domain by checking the existance of the CNAME record on the domain as:
+    {prefix}-{code}.{domain} pointing to a domain (usually yours) which the host is {prefix}
+    (i.e.: {prefix}.yourdomain.com).
+
+    Return True in case of a successful verification.
+    """
+
+    fqdn = '{}.{}'.format(prefix, domain)
+    token = '{}-{}.{}'.format(prefix, value, host)
     try:
-        records = dns.resolver.query(subdomain, 'CNAME')
-        record = records[0].to_text()
-        if record.endswith('.'):
-            record = record[:-1]
-        if value.endswith('.'):
-            value = value[:-1]
-        if record == value:
-            return True
+        for rr in dns.resolver.query(fqdn, 'CNAME'):
+            if rr.to_text().startswith(token):
+                return True
     except (dns.resolver.NoAnswer, dns.resolver.Timeout):
         logger.debug('', exc_info=True)
     return False
@@ -43,7 +48,7 @@ def _verify_txt_record(domain, value):
     Validates a domain by checking that {prefix}={code} is present in the TXT DNS record
     of the domain to check.
 
-    Returns True if verification suceeded.
+    Return True in case of a successful verification.
     """
 
     token = '{}={}'.format(SERVICE_PREFIX, value)
@@ -81,7 +86,7 @@ def _verify_meta_tag(domain, value, tag=SERVICE_PREFIX):
     Validates a domain by checking the existance of a <meta name="{prefix}" content="{code}">
     tag in the <head> of the home page of the domain using either HTTP or HTTPs protocols.
 
-    Returns true if verification suceeded.
+    Return True in case of a successful verification.
     """
 
     url = '://{}/'.format(domain)
@@ -107,7 +112,7 @@ def _verify_file_exists(domain, value):
     website using either HTTP or HTTPS protocols. The file must contain {prefix}={code} in the
     body of the file to ensure the host isn't responding 200 to any requests.
 
-    Returns true if verification suceeded.
+    Return True in case of a successful verification.
     """
 
     url = '://{}/{}.html'.format(domain, value)
@@ -146,7 +151,7 @@ def verify(domain, check_type):
     response = False
 
     if check_type == 'CNAME':
-        response = _verify_cname(code)
+        response = _verify_cname(domain, code)
     elif check_type == 'TXT':
         response = _verify_txt_record(domain, code)
     elif check_type == 'META':

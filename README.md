@@ -1,6 +1,6 @@
 # Verificatio
 
-A domain possession verification library for everyone written in Python featuring a Martini-like API with much better performance. If you need to validate the ownership of a domains, start doing some [Verificatio](https://translate.google.com/?sl=lv&tl=en&text=verific%C4%81ti%C5%8D%20&op=translate).
+A domain possession verification library for everyone written in Python featuring immaculate interface coupled with smashing performace. If you need to validate the ownership of a domains, start doing some [Verificatio](https://translate.google.com/?sl=lv&tl=en&text=verific%C4%81ti%C5%8D%20&op=translate).
 
 
 ### Supported strategies
